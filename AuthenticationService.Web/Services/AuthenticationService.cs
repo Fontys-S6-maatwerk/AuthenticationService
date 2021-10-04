@@ -71,7 +71,7 @@ namespace AuthenticationService.Services
                 var authClaims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.SerialNumber, user.DocumentNumber),
+                    //new Claim(ClaimTypes.SerialNumber, user.DocumentNumber),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
@@ -118,7 +118,7 @@ namespace AuthenticationService.Services
                 UserName = request.Email, // hacky solutions inc, we need to set this property until we change the identity config. /care
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                DocumentNumber = request.DocumentNumber,
+                //DocumentNumber = request.DocumentNumber,
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
 
