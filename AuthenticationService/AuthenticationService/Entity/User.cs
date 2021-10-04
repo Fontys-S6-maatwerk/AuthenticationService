@@ -18,13 +18,18 @@
         public string FirstName { get; set; }
 
         /// <summary>
-        /// Gets or sets the document number of the account owner.
+        /// Gets or sets the last name of the account owner.
         /// </summary>
-        public string DocumentNumber { get; set; }
+        public string LastName { get; set; }
 
         /// <summary>
         /// Gets or sets the last name of the account owner.
         /// </summary>
-        public string LastName { get; set; }
+        public string Email { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last name of the account owner.
+        /// </summary>
+        public string Password { get; set; }
     }
 }

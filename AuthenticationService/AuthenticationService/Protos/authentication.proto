@@ -22,11 +22,10 @@ message SignInRequest {
 
 // Register request.
 message RegisterRequest {
-	string email = 1;
-	string password = 2;
-	string documentNumber = 3;
-	string firstName = 4;
-	string lastName = 5;
+	string firstName = 1;
+	string lastName = 2;
+	string email = 3;
+	string password = 4;
 }
 
 message AuthOperationResponse {
@@ -43,5 +42,8 @@ message AuthEntityRequest {
 }
 
 message UserEntity {
-	string email = 1;
+	string firstName = 1;
+	string lastName = 2;
+	string email = 3;
+	string password = 4;
 }
