@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AuthenticationService.Entity;
+using AuthenticationService.Web.Entity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -35,15 +36,21 @@ namespace AuthenticationService.Services
         private readonly UserManager<User> userManager;
 
         /// <summary>
+        /// The dotnet role manager class.
+        /// </summary>
+        private readonly RoleManager<Role> roleManager;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AuthenticationService"/> class.
         /// </summary>
         /// <param name="userManager">Injected identity manager.</param>
         /// <param name="roleManager">Injected identity role manager.</param>
         /// <param name="configuration">Injected configuration class.</param>
         /// <param name="logger">Injected logger.</param>
-        public AuthenticationService(UserManager<User> userManager, IConfiguration configuration, ILogger<AuthenticationService> logger)
+        public AuthenticationService(UserManager<User> userManager, RoleManager<Role> roleManager, IConfiguration configuration, ILogger<AuthenticationService> logger)
         {
             this.userManager = userManager;
+            this.roleManager = roleManager;
             this.configuration = configuration;
             this.logger = logger;
         }
@@ -119,7 +126,7 @@ namespace AuthenticationService.Services
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
 
-            // TODO: add default customer role to user.
+            // TODO: add default user role to user.
             var result = await this.userManager.CreateAsync(newUser, request.Password).ConfigureAwait(false);
 
             if (!result.Succeeded)

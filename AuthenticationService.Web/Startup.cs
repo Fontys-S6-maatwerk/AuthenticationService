@@ -3,6 +3,7 @@ namespace AuthenticationService
 {
     using AuthenticationService.Context;
     using AuthenticationService.Entity;
+    using AuthenticationService.Web.Entity;
     using Microsoft.AspNetCore.Authentication.JwtBearer;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
@@ -30,7 +31,7 @@ namespace AuthenticationService
         {
             services.AddGrpc();
             services.AddDbContext<AuthenticationContext>(o => o.UseMySql(this.configuration.GetConnectionString("authentication-db"), ServerVersion.AutoDetect(this.configuration.GetConnectionString("authentication-db"))));
-            services.AddIdentityCore<User>()
+            services.AddIdentity<User, Role>()
                 .AddEntityFrameworkStores<AuthenticationContext>()
                 .AddDefaultTokenProviders();
 

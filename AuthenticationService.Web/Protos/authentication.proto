@@ -46,4 +46,5 @@ message UserEntity {
 	string lastName = 2;
 	string email = 3;
 	string password = 4;
+	string rolName = 5;
 }
