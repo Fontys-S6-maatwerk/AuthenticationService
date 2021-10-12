@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "Canvas.AuthenticationService";
+option csharp_namespace = "AuthenticationService";
 
 package authentication;
 
@@ -10,7 +10,7 @@ service AuthGRPCService {
 	// Method to sign in a user with its e-mail and password.
 	rpc SignIn (SignInRequest) returns (AuthOperationResponse);	
 
-	// Method to register an user with e-mail and password.
+	// Method to register an user with firtsname, lastname, e-mail and password.
 	rpc Register (RegisterRequest) returns (AuthOperationResponse);
 }
 

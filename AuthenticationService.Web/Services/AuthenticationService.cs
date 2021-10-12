@@ -5,7 +5,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Canvas.AuthenticationService;
 using AuthenticationService.Entity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Identity;

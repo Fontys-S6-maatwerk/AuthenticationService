@@ -29,7 +29,7 @@ namespace AuthenticationService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddGrpc();
-            services.AddDbContext<AuthenticationContext>(o => o.UseSqlServer(this.configuration.GetConnectionString("authentication-db")));
+            services.AddDbContext<AuthenticationContext>(o => o.UseMySql(this.configuration.GetConnectionString("authentication-db"), ServerVersion.AutoDetect(this.configuration.GetConnectionString("authentication-db"))));
             services.AddIdentityCore<User>()
                 .AddEntityFrameworkStores<AuthenticationContext>()
                 .AddDefaultTokenProviders();
