@@ -65,7 +65,8 @@ namespace AuthenticationService.Services
         /// </returns>
         public override async Task<AuthOperationResponse> SignIn(SignInRequest request, ServerCallContext context)
         {
-            var user = await this.userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
+            var userEmail = request.Email;
+            var user = await this.userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
 
             if (user == null)
             {
@@ -123,6 +124,7 @@ namespace AuthenticationService.Services
                 UserName = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+               // Password = request.Password,
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
 
@@ -136,7 +138,7 @@ namespace AuthenticationService.Services
             }
 
             // Account created
-            return new AuthOperationResponse { Contents = request.Email };
+            return new AuthOperationResponse { Contents = result.Succeeded.ToString() };
         }
     }
 }

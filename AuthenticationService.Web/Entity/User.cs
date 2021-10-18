@@ -25,7 +25,7 @@
         /// <summary>
         /// Gets or sets the last name of the account owner.
         /// </summary>
-        public string Email { get; set; }
+        //public string Email { get; set; }
 
         /// <summary>
         /// Gets or sets the last name of the account owner.
