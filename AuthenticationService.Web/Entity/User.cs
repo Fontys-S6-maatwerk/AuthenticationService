@@ -7,6 +7,7 @@
     /// </summary>
     public class User : IdentityUser
     {
+
         /// <summary>
         /// Gets or sets the foreign key of the record inside the person table that is associated with this user.
         /// </summary>

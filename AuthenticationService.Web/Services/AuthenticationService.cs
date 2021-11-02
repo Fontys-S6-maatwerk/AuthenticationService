@@ -18,7 +18,7 @@ namespace AuthenticationService.Services
     /// <summary>
     /// The default microservice authentication gRPC client.
     /// </summary>
-    public class AuthenticationService : AuthGRPCService.AuthGRPCServiceBase
+    public class AuthenticationService
     {
         /// <summary>
         /// Logger instance for the auth service.
@@ -63,9 +63,9 @@ namespace AuthenticationService.Services
         /// <returns><see cref="SignInResponse"/> that contains the status of the request and
         /// if succesfull, returns a generated JWT token.
         /// </returns>
-        public override async Task<AuthOperationResponse> SignIn(SignInRequest request, ServerCallContext context)
+        public override async Task<Token> SignIn(User userLogIn)
         {
-            var userEmail = request.Email;
+            var userEmail = userLogIn.Email;
             var user = await this.userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
 
             if (user == null)
@@ -73,7 +73,7 @@ namespace AuthenticationService.Services
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Email not found."));
             }
 
-            if (await this.userManager.CheckPasswordAsync(user, request.Password).ConfigureAwait(false))
+            if (await this.userManager.CheckPasswordAsync(user, userLogIn.Password).ConfigureAwait(false))
             {
                 var authClaims = new List<Claim>
                 {
@@ -90,17 +90,17 @@ namespace AuthenticationService.Services
                     signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
 
                 // return token.
-                return new AuthOperationResponse
+                return new Token
                 {
-                    Contents = new JwtSecurityTokenHandler().WriteToken(token),
+                    token = new JwtSecurityTokenHandler().WriteToken(token),
                 };
             }
             else
             {
-                throw new RpcException(new Status(StatusCode.Unauthenticated, "Password incorrect."));
+                throw new Exception("Password incorrect.");
             }
 
-            throw new RpcException(new Status(StatusCode.Unauthenticated, "Failed to generate token."));
+            throw new Exception("Failed to generate token.");
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace AuthenticationService.Services
         /// <param name="request">Register request.</param>
         /// <param name="context">Server context.</param>
         /// <returns>The <see cref="ServerCallContext"/> with the status of the request.</returns>
-        public override async Task<AuthOperationResponse> Register(RegisterRequest request, ServerCallContext context)
+        public async Task<string> Register(User request)
         {
             var user = await this.userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
             if (user != null)
@@ -117,19 +117,8 @@ namespace AuthenticationService.Services
                 throw new RpcException(new Status(StatusCode.AlreadyExists, "Email already in use."));
             }
 
-            // Create user object
-            var newUser = new User
-            {
-                Email = request.Email,
-                UserName = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-               // Password = request.Password,
-                SecurityStamp = Guid.NewGuid().ToString(),
-            };
-
             // TODO: add default user role to user.
-            var result = await this.userManager.CreateAsync(newUser, request.Password).ConfigureAwait(false);
+            var result = await this.userManager.CreateAsync(request, request.Password).ConfigureAwait(false);
 
             if (!result.Succeeded)
             {
@@ -138,7 +127,7 @@ namespace AuthenticationService.Services
             }
 
             // Account created
-            return new AuthOperationResponse { Contents = result.Succeeded.ToString() };
+            return result.Succeeded.ToString();
         }
     }
 }
