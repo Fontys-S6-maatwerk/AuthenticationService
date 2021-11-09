@@ -26,11 +26,12 @@ namespace Auth_Service.Web.Controllers
         public UserManager<User> userManager;
         private readonly IConfiguration configuration;
 
-        public AuthController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration configuration)
+        public AuthController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration Configuration)
         {
             _context = context;
-            this.userManager = userManager;
-            this.configuration = configuration;
+            //this.userManager = userManager;
+            this.configuration = Configuration;
+            this.authLogic = new AuthenticationLogic(userManager, configuration);
         }
 
         [HttpGet]
@@ -45,7 +46,7 @@ namespace Auth_Service.Web.Controllers
         {
             try
             {
-                var newToken = LogInAsync(user);
+                var newToken = authLogic.SignInAsync(user);
                 return StatusCode(200, newToken);
             }
             catch(Exception ex)
@@ -72,7 +73,7 @@ namespace Auth_Service.Web.Controllers
                 //DO NOT MOVE LINE 73 OTHERWISE IT BREAKS!!!
                 var result = await userManager.CreateAsync(newUser, userdto.Password);
 
-                Token token = CreateToken(newUser);
+                Token token = authLogic.CreateToken(newUser);
                 return StatusCode(201, token);
             }
             catch (Exception ex)
@@ -94,52 +95,5 @@ namespace Auth_Service.Web.Controllers
         public void Delete(Guid id)
         {
         }
-
-        private async Task<Token> LogInAsync(SignInDTO user)
-        {
-            var userEmail = user.Email;
-            var user2 = await this.userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
-
-            if (user == null)
-            {
-                throw new Exception("Email not found.");
-            }
-
-            if (await this.userManager.CheckPasswordAsync(user2, user.Password))
-            {
-                var token = CreateToken(user2);
-                return token;
-            }
-            else
-            {
-                throw new Exception("Password incorrect.");
-            }
-            
-        }
-
-        private Token CreateToken (User user)
-        {
-            var authClaims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    };
-
-            var para = this.configuration["JWT:Secret"];
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(para));
-            var token = new JwtSecurityToken(
-                issuer: this.configuration["JWT:ValidIssuer"],
-                audience: this.configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            );
-
-            return new Token
-            {
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-            };
-        }
-        
     }
 }

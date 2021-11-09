@@ -65,34 +65,17 @@ namespace Auth_Service.Web
         public async Task<Token> SignInAsync(SignInDTO userLogIn)
         {
             var userEmail = userLogIn.Email;
-            var user = await this.userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
+            var user2 = await this.userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
 
-            if (user == null)
+            if (user2 == null)
             {
                 throw new Exception("Email not found.");
             }
 
-            if (await this.userManager.CheckPasswordAsync(user, userLogIn.Password).ConfigureAwait(false))
+            if (await this.userManager.CheckPasswordAsync(user2, userLogIn.Password))
             {
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-
-                var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["JWT:Secret"]));
-                var token = new JwtSecurityToken(
-                    issuer: this.configuration["JWT:ValidIssuer"],
-                    audience: this.configuration["JWT:ValidAudience"],
-                    expires: DateTime.Now.AddHours(3),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256));
-
-                // return token.
-                return new Token
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                };
+                var token = CreateToken(user2);
+                return token;
             }
             else
             {
@@ -102,32 +85,29 @@ namespace Auth_Service.Web
             throw new Exception("Failed to generate token.");
         }
 
-        /// <summary>
-        /// Tries to register an account in the Microsoft identity.
-        /// </summary>
-        /// <param name="request">Register request.</param>
-        /// <param name="context">Server context.</param>
-        /// <returns>The <see cref="ServerCallContext"/> with the status of the request.</returns>
-        public async Task<IdentityResult> Register(User request)
+        public Token CreateToken(User user)
         {
-            var user = await this.userManager.FindByEmailAsync(request.Email).ConfigureAwait(false);
-            if (user != null)
+            var authClaims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    };
+
+            var para = this.configuration["JWT:Secret"];
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(para));
+            var token = new JwtSecurityToken(
+                issuer: this.configuration["JWT:ValidIssuer"],
+                audience: this.configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(3),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            return new Token
             {
-                throw new Exception("Email already in use.");
-            }
-
-            // TODO: add default user role to user.
-
-            var result = await this.userManager.CreateAsync(request, request.Password);
-
-            if (!result.Succeeded)
-            {
-                // Something went wrong
-                throw new Exception("Failed to create account.");
-            }
-
-            // Account created
-            return result;
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+            };
         }
+
     }
 }
