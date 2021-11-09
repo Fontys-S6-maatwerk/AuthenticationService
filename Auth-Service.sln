@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth-Service.Web", "Auth-Service.Web\Auth-Service.Web.csproj", "{6EA38EA9-894D-4116-9503-69B6A9308480}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth-Service.Data", "Auth-Service.Data\Auth-Service.Data.csproj", "{122F142A-EB32-4D41-A53B-355FC75371B9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{54A24767-0376-41AC-9BC0-65C515736723}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.gitignore = .gitignore
+		docker-compose.yaml = docker-compose.yaml
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6EA38EA9-894D-4116-9503-69B6A9308480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EA38EA9-894D-4116-9503-69B6A9308480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EA38EA9-894D-4116-9503-69B6A9308480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EA38EA9-894D-4116-9503-69B6A9308480}.Release|Any CPU.Build.0 = Release|Any CPU
+		{122F142A-EB32-4D41-A53B-355FC75371B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{122F142A-EB32-4D41-A53B-355FC75371B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{122F142A-EB32-4D41-A53B-355FC75371B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{122F142A-EB32-4D41-A53B-355FC75371B9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C43E83C-86B9-4439-800E-F5401F549D15}
+	EndGlobalSection
+EndGlobal
