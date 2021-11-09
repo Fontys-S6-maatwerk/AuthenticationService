@@ -25,7 +25,6 @@ namespace Auth_Service.Web.Controllers
         public AuthenticationLogic authLogic;
         public UserManager<User> userManager;
         private readonly IConfiguration configuration;
-        private Token newToken;
 
         public AuthController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration configuration)
         {
@@ -46,38 +45,7 @@ namespace Auth_Service.Web.Controllers
         {
             try
             {
-                var userEmail = user.Email;
-                var user2 = await this.userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
-
-                if (user == null)
-                {
-                    throw new Exception("Email not found.");
-                }
-
-                if (await this.userManager.CheckPasswordAsync(user2, user.Password))
-                {
-                    var authClaims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    };
-
-                    var para = this.configuration["JWT:Secret"];
-                    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(para));
-                    var token = new JwtSecurityToken(
-                        issuer: this.configuration["JWT:ValidIssuer"],
-                        audience: this.configuration["JWT:ValidAudience"],
-                        expires: DateTime.Now.AddHours(3),
-                        claims: authClaims,
-                        signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                    );
-
-                    newToken = new Token { token = new JwtSecurityTokenHandler().WriteToken(token) };
-                }
-                else
-                {
-                    throw new Exception("Password incorrect.");
-                }
+                var newToken = LogInAsync(user);
                 return StatusCode(200, newToken);
             }
             catch(Exception ex)
@@ -88,7 +56,7 @@ namespace Auth_Service.Web.Controllers
 
         // POST api/<UserController>
         [HttpPost]
-        public async Task<ActionResult<User>> PostAsync([FromBody] RegisterDTO userdto)
+        public async Task<IActionResult> PostAsync([FromBody] RegisterDTO userdto)
         {
             try
             {
@@ -101,9 +69,11 @@ namespace Auth_Service.Web.Controllers
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                //var result = authLogic.Register(newUser);
+                //DO NOT MOVE LINE 73 OTHERWISE IT BREAKS!!!
                 var result = await userManager.CreateAsync(newUser, userdto.Password);
-                return StatusCode(201, result);
+
+                Token token = CreateToken(newUser);
+                return StatusCode(201, token);
             }
             catch (Exception ex)
             {
@@ -123,6 +93,52 @@ namespace Auth_Service.Web.Controllers
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
+        }
+
+        private async Task<Token> LogInAsync(SignInDTO user)
+        {
+            var userEmail = user.Email;
+            var user2 = await this.userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
+
+            if (user == null)
+            {
+                throw new Exception("Email not found.");
+            }
+
+            if (await this.userManager.CheckPasswordAsync(user2, user.Password))
+            {
+                var token = CreateToken(user2);
+                return token;
+            }
+            else
+            {
+                throw new Exception("Password incorrect.");
+            }
+            
+        }
+
+        private Token CreateToken (User user)
+        {
+            var authClaims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    };
+
+            var para = this.configuration["JWT:Secret"];
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(para));
+            var token = new JwtSecurityToken(
+                issuer: this.configuration["JWT:ValidIssuer"],
+                audience: this.configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddHours(3),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+            );
+
+            return new Token
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+            };
         }
         
     }
