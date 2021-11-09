@@ -1,15 +1,25 @@
+#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
+WORKDIR /app
+EXPOSE 80
+
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-
+WORKDIR /src
+COPY ["Auth-Service.Web/Auth-Service.Web.csproj", "Auth-Service.Web/"]
+RUN dotnet restore "Auth-Service.Web/Auth-Service.Web.csproj"
 COPY . .
-RUN dotnet restore ./AuthenticationService.Web
+WORKDIR "/src/Auth-Service.Web"
+RUN dotnet build "Auth-Service.Web.csproj" -c Release -o /app/build
 
-FROM build as dev
-CMD ["dotnet", "watch", "--project", "/AuthenticationService.Web/AuthenticationService.Web.csproj", "run"]
+FROM build AS dev
+WORKDIR "/src/Auth-Service.Web"
+ENTRYPOINT ["dotnet", "watch", "run", "--urls=http://5000"]
 
 FROM build AS publish
-RUN dotnet publish AuthenticationService.Web/*.csproj -c Release -o /app/publish
+RUN dotnet publish "Auth-Service.Web.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS final
+FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "AuthenticationService.Web.dll"]
+ENTRYPOINT ["dotnet", "Auth-Service.Web.dll"]
