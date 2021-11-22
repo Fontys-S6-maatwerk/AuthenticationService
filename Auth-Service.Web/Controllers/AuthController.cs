@@ -29,7 +29,7 @@ namespace Auth_Service.Web.Controllers
         public AuthController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration Configuration)
         {
             _context = context;
-            //this.userManager = userManager;
+            this.userManager = userManager;
             this.configuration = Configuration;
             this.authLogic = new AuthenticationLogic(userManager, configuration);
         }
@@ -47,7 +47,7 @@ namespace Auth_Service.Web.Controllers
             try
             {
                 var newToken = authLogic.SignInAsync(user);
-                return StatusCode(200, newToken);
+                return StatusCode(200, newToken.Result);
             }
             catch(Exception ex)
             {
@@ -74,7 +74,7 @@ namespace Auth_Service.Web.Controllers
                 var result = await userManager.CreateAsync(newUser, userdto.Password);
 
                 Token token = authLogic.CreateToken(newUser);
-                return StatusCode(201, token);
+                return StatusCode(200, token);
             }
             catch (Exception ex)
             {

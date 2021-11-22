@@ -74,7 +74,7 @@ namespace Auth_Service.Web
 
             if (await this.userManager.CheckPasswordAsync(user2, userLogIn.Password))
             {
-                var token = CreateToken(user2);
+                Token token = CreateToken(user2);
                 return token;
             }
             else
