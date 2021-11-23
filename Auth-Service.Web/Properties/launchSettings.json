@@ -19,6 +19,13 @@
     },
     "Auth_Service.Web": {
       "commandName": "Project",
+      "launchBrowser": false,
+      "launchUrl": "swagger",
+      "dotnetRunMessages": "true",
+      "applicationUrl": "http://localhost:5000"
+    },
+    "Auth_Service_localhost": {
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {

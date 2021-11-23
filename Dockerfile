@@ -14,7 +14,7 @@ RUN dotnet build "Auth-Service.Web.csproj" -c Release -o /app/build
 
 FROM build AS dev
 WORKDIR "/src/Auth-Service.Web"
-ENTRYPOINT ["dotnet", "watch", "run", "--urls=http://5000"]
+ENTRYPOINT ["dotnet", "watch", "run", "--urls=http://+:5000"]
 
 FROM build AS publish
 RUN dotnet publish "Auth-Service.Web.csproj" -c Release -o /app/publish
