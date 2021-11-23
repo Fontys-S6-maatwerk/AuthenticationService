@@ -23,13 +23,13 @@ namespace Auth_Service.Web.Controllers
         public EventbusSend eventbusSend;
         private readonly IConfiguration configuration;
 
-        public AuthController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration Configuration, EventbusSend eventbusSend)
+        public AuthController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration Configuration)
         {
             _context = context;
             this.userManager = userManager;
             configuration = Configuration;
             authLogic = new AuthenticationLogic(userManager, configuration);
-            this.eventbusSend = eventbusSend;
+            eventbusSend = new EventbusSend();
         }
 
         [HttpGet]
@@ -65,13 +65,18 @@ namespace Auth_Service.Web.Controllers
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                //DO NOT MOVE LINE 66 OTHERWISE IT BREAKS!!!
+                //DO NOT MOVE LINE BELOW OTHERWISE IT BREAKS!!!
                 var result = await userManager.CreateAsync(newUser, userdto.Password);
 
-                string[] args = {userdto.FirstName, userdto.LastName, userdto.Email};
+                EventBusSendUserDTO sendUser = new EventBusSendUserDTO
+                {
+                    FirstName = userdto.FirstName,
+                    LastName = userdto.LastName,
+                    Email = userdto.Email
+                };
 
                 //Call eventbus
-                eventbusSend.Main(args);
+                eventbusSend.SendUser(sendUser);
 
                 Token token = authLogic.CreateToken(newUser);
                 return StatusCode(200, token);
