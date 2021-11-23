@@ -6,7 +6,7 @@ namespace Auth_Service.Web.Logic
 {
     public class EventbusSend
     {
-        public static void Main(string[] args)
+        public void Main(string[] args)
         {
             var factory = new ConnectionFactory() { HostName = "localhost" };
             using (var connection = factory.CreateConnection())
@@ -31,7 +31,7 @@ namespace Auth_Service.Web.Logic
 
         private static string GetMessageCreateUser(string[] args)
         {
-            string message = "test";
+            string message = "Create new User";
             return ((args.Length > 0) ? string.Join(" ", args) : message);
         }
     }
