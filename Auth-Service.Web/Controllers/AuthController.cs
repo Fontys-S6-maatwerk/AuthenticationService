@@ -7,11 +7,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Collections.Generic;
-using System.Security.Claims;
+using Auth_Service.Web.Logic;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,14 +20,16 @@ namespace Auth_Service.Web.Controllers
         private readonly ApplicationDbContext _context;
         public AuthenticationLogic authLogic;
         public UserManager<User> userManager;
+        public EventbusSend eventbusSend;
         private readonly IConfiguration configuration;
 
         public AuthController(ApplicationDbContext context, UserManager<User> userManager, IConfiguration Configuration)
         {
             _context = context;
             this.userManager = userManager;
-            this.configuration = Configuration;
-            this.authLogic = new AuthenticationLogic(userManager, configuration);
+            configuration = Configuration;
+            authLogic = new AuthenticationLogic(userManager, configuration);
+            eventbusSend = new EventbusSend();
         }
 
         [HttpGet]
@@ -42,20 +40,19 @@ namespace Auth_Service.Web.Controllers
 
         [HttpPost]
         [Route("signin")]
-        public async Task<IActionResult> SignIn([FromBody] SignInDTO user)
+        public IActionResult SignIn([FromBody] SignInDTO user)
         {
             try
             {
                 var newToken = authLogic.SignInAsync(user);
                 return StatusCode(200, newToken.Result);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
 
-        // POST api/<UserController>
         [HttpPost]
         public async Task<IActionResult> PostAsync([FromBody] RegisterDTO userdto)
         {
@@ -65,13 +62,21 @@ namespace Auth_Service.Web.Controllers
                 {
                     UserName = userdto.Email,
                     Email = userdto.Email,
-                    FirstName = userdto.FirstName,
-                    LastName = userdto.LastName,
                     SecurityStamp = Guid.NewGuid().ToString()
                 };
 
-                //DO NOT MOVE LINE 73 OTHERWISE IT BREAKS!!!
+                //DO NOT MOVE LINE BELOW OTHERWISE IT BREAKS!!!
                 var result = await userManager.CreateAsync(newUser, userdto.Password);
+
+                EventBusSendUserDTO sendUser = new EventBusSendUserDTO
+                {
+                    FirstName = userdto.FirstName,
+                    LastName = userdto.LastName,
+                    Email = userdto.Email
+                };
+
+                //Call eventbus
+                eventbusSend.SendUser(sendUser);
 
                 Token token = authLogic.CreateToken(newUser);
                 return StatusCode(200, token);
@@ -81,19 +86,6 @@ namespace Auth_Service.Web.Controllers
                 return StatusCode(500, ex.Message); 
             }
             
-        }
-
-        // TODO: implement patch service
-        // PUT api/<UserController>/5
-        [HttpPut("{id}")]
-        public void Put(Guid id, [FromBody] User value)
-        {
-        }
-        // TODO: implement delete sequence using rabitmq.
-        // DELETE api/<UserController>/5
-        [HttpDelete("{id}")]
-        public void Delete(Guid id)
-        {
         }
     }
 }

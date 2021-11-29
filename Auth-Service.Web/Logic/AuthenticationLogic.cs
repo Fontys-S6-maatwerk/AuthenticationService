@@ -10,7 +10,6 @@ using Auth_Service.Data.Entities;
 using AuthenticationService.Web.Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Auth_Service.Web
@@ -65,14 +64,14 @@ namespace Auth_Service.Web
         public async Task<Token> SignInAsync(SignInDTO userLogIn)
         {
             var userEmail = userLogIn.Email;
-            var user2 = await this.userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
+            var user2 = await userManager.FindByEmailAsync(userEmail).ConfigureAwait(false);
 
             if (user2 == null)
             {
                 throw new Exception("Email not found.");
             }
 
-            if (await this.userManager.CheckPasswordAsync(user2, userLogIn.Password))
+            if (await userManager.CheckPasswordAsync(user2, userLogIn.Password))
             {
                 Token token = CreateToken(user2);
                 return token;
@@ -93,11 +92,11 @@ namespace Auth_Service.Web
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     };
 
-            var para = this.configuration["JWT:Secret"];
+            var para = configuration["JWT:Secret"];
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(para));
             var token = new JwtSecurityToken(
-                issuer: this.configuration["JWT:ValidIssuer"],
-                audience: this.configuration["JWT:ValidAudience"],
+                issuer: configuration["JWT:ValidIssuer"],
+                audience: configuration["JWT:ValidAudience"],
                 expires: DateTime.Now.AddHours(3),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
