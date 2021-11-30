@@ -75,6 +75,11 @@ namespace Auth_Service.Web.Controllers
                 //DO NOT MOVE LINE BELOW OTHERWISE IT BREAKS!!!
                 var result = await userManager.CreateAsync(newUser, userdto.Password);
 
+                if (result == null)
+                {
+                    return StatusCode(400, new { errorMessage = "invalid username/password" });
+                }
+
                 EventBusSendUserDTO sendUser = new EventBusSendUserDTO
                 {
                     FirstName = userdto.FirstName,
@@ -86,11 +91,6 @@ namespace Auth_Service.Web.Controllers
                 eventbusSend.SendUser(sendUser);
 
                 Token token = authLogic.CreateToken(newUser);
-
-                if (token == null)
-                {
-                    return StatusCode(400, new { errorMessage = "invalid username/password" });
-                }
 
                 return StatusCode(200, token);
             }
