@@ -44,7 +44,7 @@ namespace Auth_Service.Web.Controllers
         {
             try
             {
-                var newToken = await authLogic.SignInAsync(user);
+                Token newToken = await authLogic.SignInAsync(user);
 
                 if(newToken == null)
                 {
@@ -86,11 +86,17 @@ namespace Auth_Service.Web.Controllers
                 eventbusSend.SendUser(sendUser);
 
                 Token token = authLogic.CreateToken(newUser);
+
+                if (token == null)
+                {
+                    return StatusCode(400, new { errorMessage = "invalid username/password" });
+                }
+
                 return StatusCode(200, token);
             }
             catch (Exception ex)
             {
-                return StatusCode(400, ex.Message); 
+                return StatusCode(400, new { errorMessage = "something went wrong", internalError = ex.Message });
             }
             
         }
