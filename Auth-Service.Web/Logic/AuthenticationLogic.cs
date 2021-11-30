@@ -83,10 +83,10 @@ namespace Auth_Service.Web
         public Token CreateToken(User user)
         {
             var authClaims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    };
+            {
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
 
             var para = configuration["JWT:Secret"];
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(para));
