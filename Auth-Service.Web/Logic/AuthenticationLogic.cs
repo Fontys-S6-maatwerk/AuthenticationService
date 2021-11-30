@@ -58,8 +58,8 @@ namespace Auth_Service.Web
         /// </summary>
         /// <param name="request">Sign in request.</param>
         /// <param name="context">Server context.</param>
-        /// <returns><see cref="SignInResponse"/> that contains the status of the request and
-        /// if succesfull, returns a generated JWT token.
+        /// <returns><see cref="SignInResponse"/> that contains the status of the request OR null if password user combo is incorrect
+        /// if succesfull, returns a generated JWT token. 
         /// </returns>
         public async Task<Token> SignInAsync(SignInDTO userLogIn)
         {
@@ -68,7 +68,7 @@ namespace Auth_Service.Web
 
             if (user2 == null)
             {
-                throw new Exception("Email not found.");
+                return null;
             }
 
             if (await userManager.CheckPasswordAsync(user2, userLogIn.Password))
@@ -76,12 +76,8 @@ namespace Auth_Service.Web
                 Token token = CreateToken(user2);
                 return token;
             }
-            else
-            {
-                throw new Exception("Password incorrect.");
-            }
 
-            throw new Exception("Failed to generate token.");
+            return null;
         }
 
         public Token CreateToken(User user)

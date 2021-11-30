@@ -40,16 +40,23 @@ namespace Auth_Service.Web.Controllers
 
         [HttpPost]
         [Route("signin")]
-        public IActionResult SignIn([FromBody] SignInDTO user)
+        public async Task<IActionResult> SignIn([FromBody] SignInDTO user)
         {
             try
             {
-                var newToken = authLogic.SignInAsync(user);
-                return StatusCode(200, newToken.Result);
+                var newToken = await authLogic.SignInAsync(user);
+
+                if(newToken == null)
+                {
+                    return StatusCode(400, new { errorMessage = "invalid username/password" });
+                }
+
+
+                return StatusCode(200, newToken);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, new { errorMessage = "something went wrong", internalError = ex.Message });
             }
         }
 
@@ -83,7 +90,7 @@ namespace Auth_Service.Web.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message); 
+                return StatusCode(400, ex.Message); 
             }
             
         }
