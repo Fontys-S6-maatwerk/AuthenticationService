@@ -30,7 +30,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DB_HOST": "20.105.18.25",
+        "DB_HOST": "20.107.136.55",
         "DB_USERNAME": "sa",
         "DB_PASSWORD": "MyC0m9l&xP@ssw0rd",
         "DB_NAME": "ggc-auth-db"
