@@ -14,7 +14,7 @@ namespace Auth_Service.Web.Logic
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.ExchangeDeclare(exchange: "topic_logs", ExchangeType.Fanout);
+                channel.ExchangeDeclare(exchange: "auth_logs", ExchangeType.Fanout);
                 //channel.QueueDeclare(queue: "auth_queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
                 //var routingKey = "auth_queue";
 
@@ -25,7 +25,7 @@ namespace Auth_Service.Web.Logic
                 properties.Persistent = true;
                 properties.CorrelationId = Guid.NewGuid().ToString();
 
-                channel.BasicPublish(exchange: "topic_logs", routingKey: "", basicProperties: properties, body: body);
+                channel.BasicPublish(exchange: "auth_logs", routingKey: "", basicProperties: properties, body: body);
 
                 //channel.BasicPublish(exchange: "", routingKey: "auth_queue", basicProperties: properties, body: body);
                 //channel.BasicPublish(exchange: "topic_logs", routingKey: routingKey, basicProperties: null, body: body);
