@@ -14,7 +14,8 @@ namespace Auth_Service.Data
 
             //Console.WriteLine("data for connection:" + username + " : " + password);
 
-            return $"Host={host};Username={username};Password={password};Database={name}";
+            //return $"Host={host};Username={username};Password={password};Database={name}";
+            return $"Data Source={host};Initial Catalog={name};User Id={username};Password={password}";
         }
     }
 }
