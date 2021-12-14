@@ -51,7 +51,6 @@ namespace Auth_Service.Web.Controllers
                     return StatusCode(400, new { errorMessage = "invalid username/password" });
                 }
 
-
                 return StatusCode(200, newToken);
             }
             catch (Exception ex)
@@ -61,6 +60,7 @@ namespace Auth_Service.Web.Controllers
         }
 
         [HttpPost]
+        [Route("register")]
         public async Task<IActionResult> PostAsync([FromBody] RegisterDTO userdto)
         {
             try

@@ -84,7 +84,8 @@ namespace Auth_Service.Web
         {
             var authClaims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, user.Email),
+                new Claim("guid", user.Id),
+                new Claim("email", user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
