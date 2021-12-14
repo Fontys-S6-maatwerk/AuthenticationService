@@ -11,8 +11,16 @@ services:
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - db-data:/var/lib/mysql
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
   api:
-    depends_on: ["db"]
+    depends_on: 
+      - db
+      - rabbitmq
     image: ggc-authservice-api
     restart: always
     build:

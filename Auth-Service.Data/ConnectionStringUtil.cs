@@ -12,10 +12,8 @@ namespace Auth_Service.Data
             string username = Environment.GetEnvironmentVariable("DB_USERNAME");
             string password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
-            //Console.WriteLine("data for connection:" + username + " : " + password);
-
-            //return $"Host={host};Username={username};Password={password};Database={name}";
-            return $"Data Source={host};Initial Catalog={name};User Id={username};Password={password}";
+            return $"Host={host};Username={username};Password={password};Database={name}";
+            //return $"Data Source={host};Initial Catalog={name};User Id={username};Password={password}";
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Auth_Service.Web.Logic
     {
         public void SendUser(EventBusSendUserDTO sendUser)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var factory = new ConnectionFactory() { HostName = "rabbitmq" };
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
